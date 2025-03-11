@@ -1,0 +1,32 @@
+type Auth {
+    id: Int!
+    email: String!
+    roles: [String]!
+}
+
+input AuthCreateInput {
+    email: String!
+    passwordHash: String!
+}
+
+input AuthLoginInput {
+    email: String!
+    password: String!
+}
+
+type AuthResponse {
+    id: Int!
+    email: String!
+    token: String!
+    roles: [String]!
+}
+
+type Query {
+    auth(id: Int!): Auth
+    profile: Auth
+}
+
+type Mutation {
+    register(authCreateInput: AuthCreateInput!): Auth!
+    login(authLoginInput: AuthCreateInput!): AuthResponse!
+}

@@ -1,0 +1,57 @@
+scalar DateTime
+
+type Book {
+    id: Int!
+    author: String!
+    title: String!
+    publicationYear: Int!
+    createdAt: DateTime
+    updatedAt: DateTime
+    reviews: [Review]
+}
+
+type Review {
+    reviewId: String!
+    content: String!
+    rating: Int!
+}
+
+input CreateBookInput {
+    author: String!
+    title: String!
+    publicationYear: Int!
+}
+
+input UpdateBookInput {
+    author: String
+    title: String
+    publicationYear: Int
+}
+
+input OrderByParams {
+    field: String
+    direction: String
+}
+
+input SearchBookInput {
+    author: String
+    title: String
+    publicationYear: Int
+}
+
+type Query {
+    books(
+        search: SearchBookInput
+        orderBy: OrderByParams
+        skip: Int
+        take: Int
+    ): [Book]!
+    book(id: Int!): Book
+}
+
+type Mutation {
+    createBook(createBookInput: CreateBookInput!): Book!
+    updateBook(id: Int!, updateBookInput: UpdateBookInput!): Book!
+    removeBook(id: Int!): Book
+    addReview(bookId: Int!, content: String!, rating: Int!): String
+}

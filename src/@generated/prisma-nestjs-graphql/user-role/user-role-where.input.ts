@@ -1,0 +1,30 @@
+import { Field } from '@nestjs/graphql';
+import { InputType } from '@nestjs/graphql';
+import { IntFilter } from '../prisma/int-filter.input';
+import { UserScalarRelationFilter } from '../user/user-scalar-relation-filter.input';
+import { RoleScalarRelationFilter } from '../role/role-scalar-relation-filter.input';
+
+@InputType()
+export class UserRoleWhereInput {
+
+    @Field(() => [UserRoleWhereInput], {nullable:true})
+    AND?: Array<UserRoleWhereInput>;
+
+    @Field(() => [UserRoleWhereInput], {nullable:true})
+    OR?: Array<UserRoleWhereInput>;
+
+    @Field(() => [UserRoleWhereInput], {nullable:true})
+    NOT?: Array<UserRoleWhereInput>;
+
+    @Field(() => IntFilter, {nullable:true})
+    userId?: IntFilter;
+
+    @Field(() => IntFilter, {nullable:true})
+    roleId?: IntFilter;
+
+    @Field(() => UserScalarRelationFilter, {nullable:true})
+    user?: UserScalarRelationFilter;
+
+    @Field(() => RoleScalarRelationFilter, {nullable:true})
+    role?: RoleScalarRelationFilter;
+}

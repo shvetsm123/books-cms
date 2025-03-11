@@ -1,0 +1,75 @@
+generator client {
+  provider      = "prisma-client-js"
+  binaryTargets = ["native", "linux-arm64-openssl-3.0.x"]
+}
+
+generator nestgraphql {
+  provider               = "node node_modules/prisma-nestjs-graphql"
+  output                 = "../src/@generated/prisma-nestjs-graphql"
+  fields_Validator_from  = "class-validator"
+  fields_Validator_input = true
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Book {
+  id              Int         @id @default(autoincrement())
+  /// @Validator.Length(3, 24)
+  author          String
+  /// @Validator.Length(3, 48)
+  title           String
+  /// @Validator.Min(0) @Validator.Max(2025)
+  publicationYear Int         @map("publication_year")
+  createdAt       DateTime    @default(now()) @map("created_at")
+  updatedAt       DateTime    @updatedAt @map("updated_at")
+  users           UserBooks[]
+
+  @@map("books")
+}
+
+model User {
+  id           Int         @id @default(autoincrement())
+  /// @Validator.IsEmail()
+  email        String      @unique
+  /// @Validator.MinLength(6)
+  passwordHash String      @map("password_hash")
+  createdAt    DateTime    @default(now()) @map("created_at")
+  updatedAt    DateTime    @updatedAt @map("updated_at")
+  books        UserBooks[]
+  roles        UserRole[]
+
+  @@map("users")
+}
+
+model UserBooks {
+  userId    Int      @map("user_id")
+  bookId    Int      @map("book_id")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  user User @relation(fields: [userId], references: [id])
+  book Book @relation(fields: [bookId], references: [id])
+
+  @@id([userId, bookId])
+  @@map("user_books")
+}
+
+model Role {
+  id    Int        @id @default(autoincrement())
+  name  String     @unique
+  users UserRole[]
+
+  @@map("roles")
+}
+
+model UserRole {
+  userId Int
+  roleId Int
+  user   User @relation(fields: [userId], references: [id])
+  role   Role @relation(fields: [roleId], references: [id])
+
+  @@id([userId, roleId])
+  @@map("user_roles")
+}
