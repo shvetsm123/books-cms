@@ -1,73 +1,114 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="200" alt="Nest Logo" /></a>
-</p>
-
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
-
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://coveralls.io/github/nestjs/nest?branch=master" target="_blank"><img src="https://coveralls.io/repos/github/nestjs/nest/badge.svg?branch=master#9" alt="Coverage" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
-
 ## Description
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+Books Content Management System (CMS) using NestJS, GraphQL, PostgreSQL, Redis, DynamoDB, and AWS. The system allows users to manage book information, handle large datasets efficiently, and ensure high availability and security.
+
+1. System Architecture:
+- The Books CMS using NestJS and GraphQL to handle data fetching and mutations efficiently.
+
+2. Database Design:
+- PostgreSQL stores relational data such as book details (title, author, publication year, etc.).
+- DynamoDB uses for managing non-relational data such as user activity logs and book reviews.
+- Implemented caching mechanisms with Redis to enhance data retrieval performance.
+  
+3. Features:
+- CRUD Operations: implemented books, auth, users, reviews, activity-logs services.
+- Implemented a robust search functionality for books with filters like author, title and publication year.
+- Sorting and Pagination: implemented sorting by different book attributes and pagination for large result sets.
+- User Authentication and Authorization: the system is secured by using JWT-based authentication and ACLs (Access Control Lists) to manage user permissions.
+- Rate Limiting: Implemented rate limiting to prevent abuse of the system with GqlThrottlerGuard.
+
+5. Scalability and Performance:
+- Designed the system to handle high loads, especially focusing on efficient query design and database indexing.
+- Ensure the system is scalable horizontally by designing stateless services that can be deployed in a load-balanced environment within AWS, including partitions feature for Books table.
+
+6. Security:
+- Ensure secure storage of sensitive data (password).
+- Implement necessary security headers and proper handling of errors to prevent common vulnerabilities like SQL injection, XSS, etc. via Helmet module.
+
+7. Testing:
+- Wrote unit tests and integration tests covering major books functionalities.
+- Documented how to run the tests.
+
+8. Documentation:
+- Provided a README file with setup and deployment instructions.
+- All API endpoints and example queries and mutations are allowed on graphql playground.
 
 ## Installation
 
 ```bash
-$ npm install
+# go to desktop
+$ cd desktop
+
+# clone repository
+$ git clone https://github.com/shvetsm123/books-cms.git
 ```
 
 ## Running the app
 
 ```bash
-# development
-$ npm run start
+# install modules
+$ npm i
 
-# watch mode
-$ npm run start:dev
+# create and fill .env file
+POSTGRES_USER=user
+POSTGRES_PASSWORD=password
+POSTGRES_DB=books_cms_db
+POSTGRES_PORT=5432
+POSTGRES_HOST=postgres
 
-# production mode
-$ npm run start:prod
+DATABASE_URL=postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@${POSTGRES_HOST}:${POSTGRES_PORT}/${POSTGRES_DB}?schema=public
+
+JWT_SECRET=secret123
+JWT_EXPIRES=30d
+
+REDIS_HOST=redis
+REDIS_PORT=6379
+
+AWS_ACCESS_KEY_ID=AKIAT7JJUU6N4G2K7UBF
+AWS_SECRET_ACCESS_KEY=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
+AWS_REGION=us-east-1
+AWS_DYNAMODB_TABLE=Reviews
+AWS_ACTIVITY_LOGS_TABLE=ActivityLogs
+
+# build and run docker-compose file
+$ docker-compose up --build
+
+# for macos arm - leave the "binaryTargets" in prisma/schema.prisma. For rest archs and os - delete this string.
 ```
 
-## Test
+## interaction with API [in app container]
 
 ```bash
-# unit tests
-$ npm run test
+# go to app container
+$ docker-compose exec app /bin/sh
 
-# e2e tests
-$ npm run test:e2e
+# add migration
+$ npx prisma migrate dev
 
-# test coverage
-$ npm run test:cov
+# add seed (books, roles)
+$ npm run prisma:seed
+
+# run the app
+$ npm run dev
+
+# visit graphql playground
+$ http://localhost:3000/graphql
+
+# general flow
+mutattion/register
+mutation/login (get token)
+mutation/createBook (paste token in headers: Auhtorization - Bearer *token*)
+mutation/addReview
+query/book 
+query/books (search, orderBy, skip, take) + redis caching
+
 ```
 
-## Support
+## Tests
 
-Nest is an MIT-licensed open source project. It can grow thanks to the sponsors and support by the amazing backers. If you'd like to join them, please [read more here](https://docs.nestjs.com/support).
+```bash
+# unit and integration tests
+$ npm run test
 
-## Stay in touch
-
-- Author - [Kamil Myśliwiec](https://kamilmysliwiec.com)
-- Website - [https://nestjs.com](https://nestjs.com/)
-- Twitter - [@nestframework](https://twitter.com/nestframework)
-
-## License
-
-Nest is [MIT licensed](LICENSE).
+# also you can run tests directly from the spec files ./src/books/*.spec.ts
+```
